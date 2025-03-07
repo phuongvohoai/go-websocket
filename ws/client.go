@@ -1,4 +1,4 @@
-package main
+package ws
 
 import "github.com/gorilla/websocket"
 
@@ -6,13 +6,15 @@ type Client struct {
 	connection *websocket.Conn
 	hub        *Hub
 	send       chan []byte
+	name       string
 }
 
-func NewClient(connection *websocket.Conn, hub *Hub) *Client {
+func NewClient(connection *websocket.Conn, hub *Hub, name string) *Client {
 	return &Client{
 		connection: connection,
 		hub:        hub,
 		send:       make(chan []byte),
+		name:       name,
 	}
 }
 
