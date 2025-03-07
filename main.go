@@ -6,9 +6,16 @@ import (
 
 	"phuong/go-websocket/routes"
 	"phuong/go-websocket/ws"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	ws.NewChatHub()
 	go ws.ChatHub.Run()
 

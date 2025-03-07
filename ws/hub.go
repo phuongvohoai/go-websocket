@@ -1,7 +1,6 @@
 package ws
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 )
@@ -33,13 +32,8 @@ func (h *Hub) Run() {
 		select {
 		case client := <-h.register:
 			h.clients[client] = true
-			message := &MessageEvent{
-				Type: "message",
-				User: "system",
-				Text: fmt.Sprintf("Welcome %s 🫡", client.name),
-			}
-			messageJson, _ := json.Marshal(message)
-			h.broadcast <- []byte(messageJson)
+			message := NewMessageEvent("system", fmt.Sprintf("Welcome %s 🫡", client.name))
+			h.broadcast <- message.ToJson()
 			// go func() {
 			// 	h.broadcast <- []byte("Client joined!")
 			// }()
@@ -47,13 +41,8 @@ func (h *Hub) Run() {
 
 		case client := <-h.unregister:
 			if _, ok := h.clients[client]; ok {
-				message := &MessageEvent{
-					Type: "message",
-					User: "system",
-					Text: fmt.Sprintf("Goodbye %s 👋", client.name),
-				}
-				messageJson, _ := json.Marshal(message)
-				h.broadcast <- []byte(messageJson)
+				message := NewMessageEvent("system", fmt.Sprintf("Goodbye %s 👋", client.name))
+				h.broadcast <- message.ToJson()
 				delete(h.clients, client)
 				close(client.send)
 				log.Printf("Client unregistered: %v", client.connection.RemoteAddr())

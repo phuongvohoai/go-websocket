@@ -40,7 +40,9 @@
   <script type="module">
     import { faker } from 'https://esm.sh/@faker-js/faker';
 
-    // Generate a random username
+    // API Key for the WebSocket server
+    const apiKey = 'a8f62c1e4d7b9f03e5a2c8d6b7f9e0d1';
+
     const userName = faker.person.lastName();
     document.getElementById("userName").textContent = userName;
     
@@ -65,7 +67,7 @@
       messages.scrollTop = messages.scrollHeight;
     }
 
-    let socket = new WebSocket("ws://localhost:8080/ws");
+    let socket = new WebSocket("ws://localhost:8080/ws?api_key=" + apiKey);
     socket.onopen = function (event) {
       socket.send(JSON.stringify({
         type: 'register',

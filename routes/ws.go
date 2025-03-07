@@ -3,6 +3,7 @@ package routes
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"phuong/go-websocket/ws"
 
@@ -23,9 +24,21 @@ func serveWebSocket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Handle authentication
+	apiKey := r.URL.Query()["api_key"]
+	if len(apiKey) != 1 || apiKey[0] != os.Getenv("API_KEY") {
+		invalidKeyMessage := ws.NewMessageEvent("system", "Invalid API key")
+		connection.WriteMessage(websocket.TextMessage, invalidKeyMessage.ToJson())
+		log.Println("Invalid API key")
+		connection.Close()
+		return
+	}
+
 	var msg ws.MessageEvent
 	err = connection.ReadJSON(&msg)
 	if err != nil || msg.Type != "register" || msg.User == "" {
+		invalidRegisterMessage := ws.NewMessageEvent("system", "Invalid registration message")
+		connection.WriteMessage(websocket.TextMessage, invalidRegisterMessage.ToJson())
 		log.Println("Invalid registration message", msg)
 		connection.Close()
 		return
